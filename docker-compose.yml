@@ -1,0 +1,32 @@
+version: '3.9'
+
+services:
+
+  shortify:
+    container_name: shortify_container
+    build:
+      context: ./shortify
+      dockerfile: Dockerfile
+    environment:
+      SHORTIFY_CONTAINER_PORT: '${SHORTIFY_CONTAINER_PORT}'
+    ports:
+      - '${SHORTIFY_HOST_PORT}:${SHORTIFY_CONTAINER_PORT}'
+    depends_on:
+      - postgres
+    volumes:
+      - ./shortify/:/go/src/app
+
+  postgres:
+    image: postgres:13.3-alpine
+    container_name: postgress-container
+    environment:
+      POSTGRES_USER: '${POSTGRES_USER}'
+      POSTGRES_PASSWORD: '${POSTGRES_PASSWORD}'
+      POSTGRES_DB: '${POSTGRES_DB}'
+    ports:
+      - '${POSTGRES_HOST_PORT}:${POSTGRES_CONTAINER_PORT}'
+    restart: always
+    volumes:
+      - ./initDB.sql:/docker-entrypoint-initdb.d/initDB.sql
+
+
