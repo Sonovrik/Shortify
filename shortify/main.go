@@ -7,8 +7,14 @@ import (
 	"os"
 )
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Hello World!!!")
+func serveFiles(w http.ResponseWriter, r *http.Request) {
+	fmt.Println(r.URL.Path)
+	p := "." + r.URL.Path
+	if p == "./" {
+		p = "./html/"
+	}
+
+	//http.ServeFile(w, r, http.FileServer(http.Dir(p)))
 }
 
 func main() {
@@ -16,6 +22,11 @@ func main() {
 	if !exists {
 		panic("No SHORTIFY_CONTAINER_PORT")
 	}
-	http.HandleFunc("/", handler) // each request calls handler
+
+	//fileServer := http.FileServer(http.Dir("./html"))
+	//http.Handle("/html/", http.StripPrefix("/html/", fileServer))
+	http.Handle("/", http.FileServer(http.Dir("./html/")))
+
+	//http.HandleFunc("/", serveFiles)
 	log.Fatal(http.ListenAndServe("0.0.0.0:" + port, nil))
 }

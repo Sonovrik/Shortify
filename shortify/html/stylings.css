@@ -1,0 +1,40 @@
+/* form starting stylings ------------------------------- */
+.group {
+    position: fixed; top: 50%; left: 50%;
+    margin: 0 auto;
+    width:250px;
+    -webkit-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+
+html {
+    background: url(back.jpeg) no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+button {
+    background-color: #000000;
+    border: none;
+    color: white;
+    padding: 10px 10px;
+    cursor: pointer;
+    border-radius: 10px;
+    width: 120%;
+    font-size: 15px;
+}
+
+input {
+    font-size: 16px;
+    padding: 10px;
+    display: block;
+    width: 300px;
+    border: none;
+    border-bottom: 1px solid #ccc;
+}
+input:focus {
+    outline: none;
+}
