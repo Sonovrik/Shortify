@@ -6,8 +6,8 @@ COPY . .
 
 RUN go mod download
 
-RUN go get github.com/githubnemo/CompileDaemon
-ENTRYPOINT CompileDaemon -command="./shortify"
+#RUN go get github.com/githubnemo/CompileDaemon
+#ENTRYPOINT CompileDaemon -command="./shortify"
 
 
 EXPOSE ${SHORTIFY_CONTAINER_PORT}
