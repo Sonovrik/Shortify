@@ -1,0 +1,5 @@
+title: "shortify service"
+server:
+  bind: ":8080"
+logger:
+  level: "debug"
