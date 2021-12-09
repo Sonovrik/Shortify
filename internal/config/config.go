@@ -11,6 +11,7 @@ type AppConfig struct {
 	Title  string `yaml:"title"`
 	Server Server `yaml:"server"`
 	Logger Logger `yaml:"logger"`
+	Db     DB     `yaml:"postgres"`
 }
 
 type Server struct {
@@ -19,6 +20,15 @@ type Server struct {
 
 type Logger struct {
 	Level string `yaml:"level"`
+}
+
+type DB struct {
+	Host     string `yaml:"host"`
+	Port     string `yaml:"port"`
+	User     string `yaml:"user"`
+	Password string `yaml:"password"`
+	DBName   string `yaml:"dbname"`
+	SslMode  string `yaml:"sslmode"`
 }
 
 func Default() *AppConfig {
@@ -30,6 +40,14 @@ func Default() *AppConfig {
 		Logger: Logger{
 			Level: "debug",
 		},
+		Db: DB{
+			Host:     "localhost",
+			Port:     "8082",
+			User:     "root",
+			Password: "root",
+			DBName:   "UrlsSchema",
+			SslMode:  "disable",
+		},
 	}
 }
 
@@ -39,9 +57,10 @@ func Init(confPath string) (c *AppConfig, e error) {
 		return nil, errors.New("using default config cause err reading config-file")
 	}
 
+	// TODO think about DEFAULT
 	c = Default()
 	if err = yaml.Unmarshal(yamlFile, c); err != nil {
-		return nil, errors.New("using default config cause unmarshaling config-file error")
+		return nil, errors.New("using default config cause unmarshalling config-file error")
 	}
 
 	return c, nil

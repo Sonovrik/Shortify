@@ -67,14 +67,13 @@ func (s *HttpService) configureRouter() {
 	s.router.Use(middleware.Timeout(60 * time.Second))
 
 	s.router.Route("/", func(r chi.Router) {
-		//r.With(s.userIdentity).Init("/me", s.HandleMe())
-		//r.With(s.userIdentity).Init("/i", s.HandleInfo())
-		//
-		r.Post("/create", s.HandleCreate())
-		// r.Init("/login", s.server.HandleLogin())
-		// r.Init("/logout", s.HandleLogout())
-		// r.Init("/test", s.HandleTest())
+		r.With(s.dataValidationMiddleware).Post("/create", s.HandleCreate())
 	})
+}
+
+func (s *HttpService) configureDB() error {
+
+	return nil
 }
 
 func (s *HttpService) configureServer() error {
@@ -94,6 +93,7 @@ func (s *HttpService) Shutdown(shutdownCtx context.Context) error {
 func (s *HttpService) Run(ctx context.Context, cancel context.CancelFunc) {
 	go func() {
 		s.logger.Info(fmt.Sprintf("Start httpserver on %s!", s.config.Server.Bind))
+
 		err := s.server.ListenAndServe()
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			s.logger.Error("error serve s httpserver", logrus.Fields{"error": err})

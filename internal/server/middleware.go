@@ -28,11 +28,10 @@ func isValidUrl(token string) bool {
 	return true
 }
 
-func (s *HttpService) dataValidation(next http.Handler) http.Handler {
+func (s *HttpService) dataValidationMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			// 500, ctx
 			w.WriteHeader(http.StatusInternalServerError)
 			next.ServeHTTP(w, r)
 		}
@@ -40,13 +39,11 @@ func (s *HttpService) dataValidation(next http.Handler) http.Handler {
 		bodyData := JsonRequestUrl{}
 
 		if err = json.Unmarshal(body, &bodyData); err != nil {
-			// error in json body, ctx
 			w.WriteHeader(http.StatusBadRequest)
 			next.ServeHTTP(w, r)
 		}
 
 		if ok := isValidUrl(bodyData.LongUrl); !ok {
-			// wrong url content, ctx
 			w.WriteHeader(http.StatusBadRequest)
 			next.ServeHTTP(w, r)
 		}

@@ -3,3 +3,10 @@ server:
   bind: ":8080"
 logger:
   level: "debug"
+postgres:
+  host: "localhost"
+  port: "8082"
+  user: "root"
+  password: "root"
+  dbname: "UrlsSchema"
+  sslmode: "disable"

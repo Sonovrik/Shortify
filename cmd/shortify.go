@@ -26,8 +26,6 @@ func initEnvs() {
 
 func main() {
 	var configPath string
-	ctx, stop := context.WithCancel(context.Background())
-	defer stop()
 
 	initEnvs()
 	flag.StringVar(&configPath, "config-path", os.Getenv("ROOT_PATH")+"/"+"configs/config.yaml", "path to config file")
@@ -40,6 +38,9 @@ func main() {
 		cfg = config.Default()
 	}
 
+	ctx, stop := context.WithCancel(context.Background())
+	defer stop()
+
 	s := server.New(ctx, cfg)
 	s.Run(ctx, stop)
 
@@ -48,9 +49,10 @@ func main() {
 	go func() {
 		<-sig
 
-		shutdownCtx, _ := context.WithTimeout(ctx, 30*time.Second)
+		shutdownCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
 		go func() {
 			<-shutdownCtx.Done()
+
 			if shutdownCtx.Err() == context.DeadlineExceeded {
 				logrus.Fatal("graceful shutdown timed out.. forcing exit")
 			}
@@ -60,7 +62,9 @@ func main() {
 		if err != nil {
 			logrus.Fatal(err)
 		}
+
 		stop()
+		cancel()
 	}()
 
 	<-ctx.Done()
