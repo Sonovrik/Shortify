@@ -1,18 +1,22 @@
+.PHONY: build run test lint clean
 
-COMPOSE_FILE=docker-compose.yml
-ENV=.env
-PATH_TO_BUILD=./
+NAME=auth
 
-all:
-	docker-compose -f $(PATH_TO_BUILD)$(COMPOSE_FILE) --env-file $(PATH_TO_BUILD)$(ENV) up --build -d
+build:
+	go build -v ./cmd/shortify.go
+
+run:
+	go run ./cmd/shortify.go
+
+test:
+	go test -v -timeout 30s ./...
+
+lint:
+	gofmt -s -w .
+	golangci-lint run ./... --fix
 
 clean:
-	docker-compose -f $(PATH_TO_BUILD)$(COMPOSE_FILE) --env-file $(PATH_TO_BUILD)$(ENV) down
+	rm -rf $(NAME)
 
-
-fclean: clean
-	docker system prune -f -a --volumes
-
-re: fclean all
-
-.PHONY: all clean fclean re
+cleanSum:
+	rm -rf go.sum

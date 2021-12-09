@@ -2,7 +2,7 @@ FROM golang:alpine
 
 WORKDIR /go/src/app
 
-COPY . .
+COPY ../shortify .
 
 RUN go mod download
 

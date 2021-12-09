@@ -5,7 +5,7 @@ services:
   shortify:
     container_name: shortify_container
     build:
-      context: ./shortify
+      context: ../shortify
       dockerfile: Dockerfile
     environment:
       SHORTIFY_CONTAINER_PORT: '${SHORTIFY_CONTAINER_PORT}'

@@ -6,12 +6,12 @@ import (
 	"Short/internal/server"
 	"context"
 	"flag"
-	"github.com/sirupsen/logrus"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 func initEnvs() {
@@ -49,17 +49,16 @@ func main() {
 		<-sig
 
 		shutdownCtx, _ := context.WithTimeout(ctx, 30*time.Second)
-
 		go func() {
 			<-shutdownCtx.Done()
 			if shutdownCtx.Err() == context.DeadlineExceeded {
-				log.Fatal("graceful shutdown timed out.. forcing exit.")
+				logrus.Fatal("graceful shutdown timed out.. forcing exit")
 			}
 		}()
 
 		err := s.Shutdown(shutdownCtx)
 		if err != nil {
-			log.Fatal(err)
+			logrus.Fatal(err)
 		}
 		stop()
 	}()

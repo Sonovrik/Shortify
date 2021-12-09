@@ -5,11 +5,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
+	"time"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/sirupsen/logrus"
-	"net/http"
-	"time"
 )
 
 type HttpService struct {
@@ -36,7 +37,7 @@ func New(ctx context.Context, cfg *config.AppConfig) *HttpService {
 
 	if err := server.configureServer(); err != nil {
 		ctx.Done()
-		//return err
+		// return err
 	}
 
 	return server
@@ -69,9 +70,10 @@ func (s *HttpService) configureRouter() {
 		//r.With(s.userIdentity).Init("/me", s.HandleMe())
 		//r.With(s.userIdentity).Init("/i", s.HandleInfo())
 		//
-		//r.Init("/login", s.HandleLogin())
-		//r.Init("/logout", s.HandleLogout())
-		//r.Init("/test", s.HandleTest())
+		r.Post("/create", s.HandleCreate())
+		// r.Init("/login", s.server.HandleLogin())
+		// r.Init("/logout", s.HandleLogout())
+		// r.Init("/test", s.HandleTest())
 	})
 }
 
@@ -90,9 +92,8 @@ func (s *HttpService) Shutdown(shutdownCtx context.Context) error {
 }
 
 func (s *HttpService) Run(ctx context.Context, cancel context.CancelFunc) {
-
 	go func() {
-		s.logger.Info(fmt.Sprintf("Start http httpserver on %s!", s.config.Server.Bind), nil)
+		s.logger.Info(fmt.Sprintf("Start httpserver on %s!", s.config.Server.Bind))
 		err := s.server.ListenAndServe()
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			s.logger.Error("error serve s httpserver", logrus.Fields{"error": err})
@@ -102,7 +103,7 @@ func (s *HttpService) Run(ctx context.Context, cancel context.CancelFunc) {
 
 	<-ctx.Done()
 
-	s.logger.Info(fmt.Sprintf("Shutdown http httpserver on %s!", s.config.Server.Bind), nil)
+	s.logger.Info(fmt.Sprintf("Shutdown http httpserver on %s!", s.config.Server.Bind))
 
 	err := s.server.Shutdown(context.Background())
 	if err != nil {
