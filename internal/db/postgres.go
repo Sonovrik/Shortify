@@ -1,13 +1,16 @@
 package db
 
 import (
+	"Short/internal/config"
 	"database/sql"
 	"fmt"
+
+	"github.com/sirupsen/logrus"
 )
 
 type DB struct {
-	options Options
-	db      sql.DB
+	Options *Options
+	DB      *sql.DB
 }
 
 type Options struct {
@@ -19,8 +22,7 @@ type Options struct {
 	SslMode  string
 }
 
-func Open(o *Options) *DB {
-	// TODO check porting
+func openDB(o *Options) (*sql.DB, error) {
 	connectionString := fmt.Sprintf(""+
 		"user=%s "+
 		"dbname=%s "+
@@ -29,20 +31,43 @@ func Open(o *Options) *DB {
 		"port=%s "+
 		"sslmode=%s",
 		o.User, o.DBName, o.Password, o.Host, o.Port, o.SslMode)
-	sqlDb, err := sql.Open("postgres", connectionString)
+
+	sqlDB, err := sql.Open("postgres", connectionString)
 	if err != nil {
-		return nil
-	}
-	//defer db.Close() // ???
+		sqlDB.Close()
 
-	if err = sqlDb.Ping(); err != nil {
-		return nil
+		return nil, err
 	}
 
-	//retDB := DB{
-	//	options: o
-	//	db: sqlDb
-	//}
+	// check ping
+	if err := sqlDB.Ping(); err != nil {
+		return nil, err
+	}
 
-	//return db
+	return sqlDB, nil
+}
+
+func New(config *config.AppConfig) *DB {
+	opt := &Options{
+		Host:     config.DB.Host,
+		Port:     config.DB.Port,
+		User:     config.DB.User,
+		Password: config.DB.Password,
+		DBName:   config.DB.DBName,
+		SslMode:  config.DB.SslMode,
+	}
+
+	sqlDB, err := openDB(opt)
+	if err != nil {
+		logrus.Fatalf("error while connect to db: %s", err.Error())
+
+		return nil
+	}
+
+	db := &DB{
+		Options: opt,
+		DB:      sqlDB,
+	}
+
+	return db
 }

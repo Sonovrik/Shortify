@@ -3,18 +3,16 @@ package server
 import (
 	"context"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 )
 
-const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890"
-
-type JsonRequestUrl struct {
-	LongUrl string `json:"longurl"`
+type JSONRequestURL struct {
+	LongURL string `json:"longurl"`
 }
 
-func isValidUrl(token string) bool {
+func isValidURL(token string) bool {
 	_, err := url.ParseRequestURI(token)
 	if err != nil {
 		return false
@@ -28,27 +26,27 @@ func isValidUrl(token string) bool {
 	return true
 }
 
-func (s *HttpService) dataValidationMiddleware(next http.Handler) http.Handler {
+func (s *HTTPService) dataValidationMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		body, err := ioutil.ReadAll(r.Body)
+		body, err := io.ReadAll(r.Body)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			next.ServeHTTP(w, r)
 		}
 
-		bodyData := JsonRequestUrl{}
+		bodyData := JSONRequestURL{}
 
 		if err = json.Unmarshal(body, &bodyData); err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			next.ServeHTTP(w, r)
 		}
 
-		if ok := isValidUrl(bodyData.LongUrl); !ok {
+		if ok := isValidURL(bodyData.LongURL); !ok {
 			w.WriteHeader(http.StatusBadRequest)
 			next.ServeHTTP(w, r)
 		}
 
-		ctx := context.WithValue(r.Context(), "Long url", bodyData.LongUrl)
+		ctx := context.WithValue(r.Context(), "LongURL", bodyData.LongURL)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

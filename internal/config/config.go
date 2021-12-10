@@ -2,7 +2,7 @@ package config
 
 import (
 	"errors"
-	"io/ioutil"
+	"os"
 
 	yaml "gopkg.in/yaml.v3"
 )
@@ -11,7 +11,7 @@ type AppConfig struct {
 	Title  string `yaml:"title"`
 	Server Server `yaml:"server"`
 	Logger Logger `yaml:"logger"`
-	Db     DB     `yaml:"postgres"`
+	DB     DB     `yaml:"postgres"`
 }
 
 type Server struct {
@@ -40,7 +40,7 @@ func Default() *AppConfig {
 		Logger: Logger{
 			Level: "debug",
 		},
-		Db: DB{
+		DB: DB{
 			Host:     "localhost",
 			Port:     "8082",
 			User:     "root",
@@ -52,7 +52,7 @@ func Default() *AppConfig {
 }
 
 func Init(confPath string) (c *AppConfig, e error) {
-	yamlFile, err := ioutil.ReadFile(confPath)
+	yamlFile, err := os.ReadFile(confPath)
 	if err != nil {
 		return nil, errors.New("using default config cause err reading config-file")
 	}

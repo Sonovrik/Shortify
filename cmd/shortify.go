@@ -1,7 +1,7 @@
 package main
 
 import (
-	"Short"
+	definitions "Short"
 	"Short/internal/config"
 	"Short/internal/server"
 	"context"
@@ -16,9 +16,10 @@ import (
 
 func initEnvs() {
 	// Set root env
-	if err := Short.SetRootEnvs("ROOT_PATH"); err != nil {
+	if err := definitions.SetRootEnvs("ROOT_PATH"); err != nil {
 		logrus.Info(err.Error())
-		if err = Short.SetDefaultEnvs(); err != nil {
+
+		if err = definitions.SetDefaultEnvs(); err != nil {
 			logrus.Fatalln(err.Error())
 		}
 	}
@@ -46,10 +47,12 @@ func main() {
 
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+
 	go func() {
 		<-sig
 
 		shutdownCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
+
 		go func() {
 			<-shutdownCtx.Done()
 

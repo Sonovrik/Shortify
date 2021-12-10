@@ -2,6 +2,7 @@ package server
 
 import (
 	"Short/internal/config"
+	"Short/internal/db"
 	"context"
 	"errors"
 	"fmt"
@@ -13,37 +14,42 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type HttpService struct {
+type HTTPService struct {
 	server *http.Server
 	config *config.AppConfig
 	logger *logrus.Logger
 	router *chi.Mux
+	db     *db.DB
 }
 
-func New(ctx context.Context, cfg *config.AppConfig) *HttpService {
+func New(ctx context.Context, cfg *config.AppConfig) *HTTPService {
 	appLogger := logrus.New()
 	appRouter := chi.NewRouter()
+	database := db.New(cfg)
 	appServer := &http.Server{
 		Addr:    cfg.Server.Bind,
 		Handler: appRouter,
 	}
 
-	server := &HttpService{
+	server := &HTTPService{
 		server: appServer,
 		config: cfg,
 		logger: appLogger,
 		router: appRouter,
+		db:     database,
 	}
 
 	if err := server.configureServer(); err != nil {
+		logrus.Error(err.Error())
 		ctx.Done()
-		// return err
+
+		return nil // ???
 	}
 
 	return server
 }
 
-func (s *HttpService) configureLogger() error {
+func (s *HTTPService) configureLogger() error {
 	level, err := logrus.ParseLevel(s.config.Logger.Level)
 	if err != nil {
 		return err
@@ -54,7 +60,7 @@ func (s *HttpService) configureLogger() error {
 	return nil
 }
 
-func (s *HttpService) configureRouter() {
+func (s *HTTPService) configureRouter() {
 	// A good base middleware stack
 	s.router.Use(middleware.RequestID)
 	s.router.Use(middleware.RealIP)
@@ -71,12 +77,7 @@ func (s *HttpService) configureRouter() {
 	})
 }
 
-func (s *HttpService) configureDB() error {
-
-	return nil
-}
-
-func (s *HttpService) configureServer() error {
+func (s *HTTPService) configureServer() error {
 	if err := s.configureLogger(); err != nil {
 		return err
 	}
@@ -86,11 +87,11 @@ func (s *HttpService) configureServer() error {
 	return nil
 }
 
-func (s *HttpService) Shutdown(shutdownCtx context.Context) error {
+func (s *HTTPService) Shutdown(shutdownCtx context.Context) error {
 	return s.server.Shutdown(shutdownCtx)
 }
 
-func (s *HttpService) Run(ctx context.Context, cancel context.CancelFunc) {
+func (s *HTTPService) Run(ctx context.Context, cancel context.CancelFunc) {
 	go func() {
 		s.logger.Info(fmt.Sprintf("Start httpserver on %s!", s.config.Server.Bind))
 

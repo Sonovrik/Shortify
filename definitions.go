@@ -1,4 +1,4 @@
-package Short
+package Shortify
 
 import (
 	"errors"
