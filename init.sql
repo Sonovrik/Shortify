@@ -1,0 +1,2 @@
+CREATE DATABASE postgres_db;
+GRANT ALL PRIVILEGES ON DATABASE postgres_db TO root;

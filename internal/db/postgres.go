@@ -19,7 +19,7 @@ type Options struct {
 	SslMode  string
 }
 
-func New(o *Options) *DB {
+func Open(o *Options) *DB {
 	// TODO check porting
 	connectionString := fmt.Sprintf(""+
 		"user=%s "+

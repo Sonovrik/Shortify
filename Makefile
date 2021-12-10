@@ -1,6 +1,8 @@
-.PHONY: build run test lint clean
 
 NAME=auth
+COMPOSE_FILE=docker-compose.yml
+ENV=.env
+PATH_TO_BUILD=./
 
 build:
 	go build -v ./cmd/shortify.go
@@ -20,3 +22,14 @@ clean:
 
 cleanSum:
 	rm -rf go.sum
+
+docker:
+	docker-compose -f $(PATH_TO_BUILD)$(COMPOSE_FILE) --env-file $(PATH_TO_BUILD)$(ENV) up --build -d
+
+cleanDocker:
+	docker-compose -f $(PATH_TO_BUILD)$(COMPOSE_FILE) --env-file $(PATH_TO_BUILD)$(ENV) down
+
+fcleanDocker:
+	docker system prune -f -a --volumes
+
+.PHONY: build run test lint clean

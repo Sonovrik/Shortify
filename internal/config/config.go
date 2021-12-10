@@ -45,7 +45,7 @@ func Default() *AppConfig {
 			Port:     "8082",
 			User:     "root",
 			Password: "root",
-			DBName:   "UrlsSchema",
+			DBName:   "postgres_db",
 			SslMode:  "disable",
 		},
 	}

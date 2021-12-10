@@ -4,9 +4,9 @@ server:
 logger:
   level: "debug"
 postgres:
-  host: "localhost"
-  port: "8082"
+  host: "postgres_container"
+  port: "5432"
   user: "root"
   password: "root"
-  dbname: "UrlsSchema"
+  dbname: "postgres_db"
   sslmode: "disable"

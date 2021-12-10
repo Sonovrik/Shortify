@@ -30,6 +30,6 @@ services:
       - '${POSTGRES_HOST_PORT}:${POSTGRES_CONTAINER_PORT}'
     restart: always
     volumes:
-      - ./initDB.sql:/docker-entrypoint-initdb.d/initDB.sql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
 
